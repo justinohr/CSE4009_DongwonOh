@@ -13,6 +13,7 @@ int main(void){
 	act_new.sa_handler = sig_fn;
 	sigemptyset(&act_new.sa_mask);
 
+	printf("Signal number: %d\n", SIGINT);
 	sigaction(SIGINT, &act_new, &act_old); //register handler
 	for(;;) pause();
 }
