@@ -16,6 +16,7 @@ int main(void){
 	printf("Signal number: %d\n", SIGINT);
 	sigaction(SIGINT, &act_new, &act_old); //register handler
 	for(;;) pause();
+	return 0;
 }
 
 static void sig_fn(int signo){
