@@ -5,4 +5,5 @@ int main(void){
 	for (i = 0; i<30000; i++)
 		for (j = 0; j<80000; j++)
 			k += i*j;
+	return 0;
 }
