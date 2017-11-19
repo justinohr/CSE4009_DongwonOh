@@ -10,10 +10,10 @@ struct mat{
 	int **B;
 	long long int** C;
 	int alloc;
+	long long int* sum;
 	pthread_barrier_t *bar;
 };
 void* mul(void *arg);
-void add(long long int**);
 int main(void){
 	mat arg[NUM];
 	int i, j;
@@ -25,7 +25,9 @@ int main(void){
 	int **A = (int**)malloc(sizeof(int*) * 4000);
 	int **B = (int**)malloc(sizeof(int*) * 4000);
 	long long int **C = (long long int**)malloc(sizeof(long long int*) * 4000);
-	for(i = 0; i < NUM; i++) arg[i].A = A, arg[i].B = B, arg[i].C = C, arg[i].alloc = i, arg[i].bar = &bar;
+	long long int *sum;
+	*sum = 0;
+	for(i = 0; i < NUM; i++) arg[i].A = A, arg[i].B = B, arg[i].C = C, arg[i].alloc = i, arg[i].bar = &bar, arg[i].sum = sum;
 	for(i = 0; i < 4000; i++)
 		A[i] = (int*)malloc(sizeof(int)*4000),
 		B[i] = (int*)malloc(sizeof(int)*4000), 
@@ -38,7 +40,6 @@ int main(void){
 	start = time(NULL);
 	for(i = 0; i < NUM; i++) pthread_create(&tid[i], NULL, mul, (void*)&arg[i]);
 	pthread_barrier_wait(&bar);
-	add(C);
 	finish = time(NULL);
 	printf("Elapsed seconds: %ld", finish - start);
 	return 0;
@@ -51,6 +52,7 @@ void* mul(void *arg){
 	int **B = argv->B;
 	long long int **C = argv->C;
 	int alloc = argv->alloc;
+	long long int *s = argv->sum; 
 	long long int sum;
 	for(i = 4000/NUM * alloc; i < 4000 / NUM * (alloc + 1); i++){
 		for(j = 0; j < 4000; j++){
@@ -62,11 +64,6 @@ void* mul(void *arg){
 			printf("C[%d][%d] done\n",i,j);
 		}
 	}
+	*s += sum;
 	pthread_barrier_wait(argv->bar);
-}
-
-void add(long long int **C){
-	long long int sum = 0;
-	int i,j;
-	for(i = 0; i < 4000; i++) for(j = 0; j < 4000; j++) sum += C[i][j];
 }
