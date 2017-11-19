@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <time.h>
-#define NUM 20
+#define NUM 4
 
 typedef struct mat mat;
 struct mat{
@@ -21,12 +21,13 @@ int main(void){
 	time_t start, finish;
 	pthread_t tid[NUM];
 	pthread_barrier_t bar;
+	pthread_barrier_init(&bar, NULL, NUM + 1);
 	int **A = (int**)malloc(sizeof(int*) * 4000);
 	int **B = (int**)malloc(sizeof(int*) * 4000);
-	long long int **C = (long long int**)malloc(sizeof(long long int*) * 4000);	
-	long long int sum;
-	sum = 0;
-	for(i = 0; i < NUM; i++) arg[i].A = A, arg[i].B = B, arg[i].C = C, arg[i].alloc = i, arg[i].bar = &bar, arg[i].sum = &sum;
+	long long int **C = (long long int**)malloc(sizeof(long long int*) * 4000);
+	long long int *sum;
+	*sum = 0;
+	for(i = 0; i < NUM; i++) arg[i].A = A, arg[i].B = B, arg[i].C = C, arg[i].alloc = i, arg[i].bar = &bar, arg[i].sum = sum;
 	for(i = 0; i < 4000; i++)
 		A[i] = (int*)malloc(sizeof(int)*4000),
 		B[i] = (int*)malloc(sizeof(int)*4000), 
@@ -36,7 +37,6 @@ int main(void){
 	for(i = 0; i < 4000; i++) for(j = 0; j < 4000; j++) 
 		fscanf(fd1, "%d", &(A[i][j])), fscanf(fd2, "%d", &(B[i][j])); 
 	printf("Starting multiplication\n");
-	pthread_barrier_init(&bar, NULL, NUM + 1);
 	start = time(NULL);
 	for(i = 0; i < NUM; i++) pthread_create(&tid[i], NULL, mul, (void*)&arg[i]);
 	pthread_barrier_wait(&bar);
@@ -61,7 +61,7 @@ void* mul(void *arg){
 				sum += A[i][k] * B[k][j];
 			}
 			*s += C[i][j] = sum;
-			printf("C[%d][%d] done\n",i,j);						
+			printf("C[%d][%d] done\n",i,j);
 		}
 	}
 	pthread_barrier_wait(argv->bar);
