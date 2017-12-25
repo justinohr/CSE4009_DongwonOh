@@ -75,6 +75,7 @@ int main(void){
 			printf("%s", (char*)shm_addr);
 			break;
 		default:
+			if(shmdt(shm_addr) == 0) printf("Shared memory is detached successfully.\n");
 			exit(0);
 		}
 	}
