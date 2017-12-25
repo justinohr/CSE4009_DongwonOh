@@ -48,6 +48,7 @@ int main(void){
 			for(j = 1; j <= 4; j++){
 				while((nbytes = msgrcv(que_id[i], &msg, msg_size, j <= 3? pid[j] : 1, IPC_NOWAIT)) > 0){
 					if(msg.mtype == 1){
+						printf("%s\n", msg.mtext);
 						sprintf((char*)(shm_addr + offset), "%s\n", msg.mtext);
 						offset += strlen(msg.mtext) + 1;
 					}
